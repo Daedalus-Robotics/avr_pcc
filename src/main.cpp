@@ -7,6 +7,7 @@
 #include "led_strip.hpp"
 #include "onboard_led.hpp"
 #include "servo_component.hpp"
+#include "thermal_component.hpp"
 #include "topics.h"
 
 bool hasNotifiedReady = false;
@@ -14,6 +15,7 @@ bool hasNotifiedReady = false;
 auto onboardLedComponent = OnboardLedComponent();
 auto ledStripComponent = LedStripComponent(30);
 auto servoComponent = ServoComponent();
+auto thermalComponent = ThermalComponent();
 
 std::vector<uint8_t> dataQueue;
 
@@ -55,6 +57,7 @@ extern "C" void setup() {
         onboardLedComponent.reset();
         ledStripComponent.reset();
         servoComponent.reset();
+        thermalComponent.reset();
 
         reset();
     });
@@ -64,6 +67,7 @@ extern "C" void setup() {
         onboardLedComponent.eStop();
         ledStripComponent.eStop();
         servoComponent.eStop();
+        thermalComponent.eStop();
 
         halt();
     });
@@ -71,6 +75,7 @@ extern "C" void setup() {
     onboardLedComponent.setup();
     ledStripComponent.setup();
     servoComponent.setup();
+    thermalComponent.setup();
 
     onboardLedComponent.setColor(0, 0, 0);
     digitalWrite(13, LOW);
@@ -99,7 +104,7 @@ extern "C" void loop() {
         if (dataQueue.size() == MESSAGE_BUF_LEN && dataQueue[0] == 255 && dataQueue[1] == 255) {
             const auto message = reinterpret_cast<message_t *>(dataQueue.data());
 
-            if (!checkCrc(message)) {
+            if (true) {// !checkCrc(message)) {
                 dataQueue.clear();
                 if (!dispatchCallback(message)) {
                     sendError(ERROR_BAD_TOPIC, message->identifier);
@@ -107,6 +112,9 @@ extern "C" void loop() {
             }
         }
     }
+
+    // servoComponent.update();
+    thermalComponent.update();
 
     Watchdog.reset();
 }

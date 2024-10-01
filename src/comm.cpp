@@ -42,18 +42,19 @@ bool dispatchCallback(const message_t *message) {
 
 void sendError(const uint8_t code, const uint8_t data) {
     message_t errorFrame = {
-        SOL_CHAR,
-        TOPIC_ERROR,
-        { code, data, 0, 0, 0, 0, 0, 0 }
+        SOL_NUM,
+        TOPIC_ERROR
     };
+    errorFrame.data[0] = code;
+    errorFrame.data[1] = data;
     sendMessage(&errorFrame);
 }
 
 void sendStatus(const uint8_t code) {
     message_t statusFrame = {
-        SOL_CHAR,
-        TOPIC_STATUS,
-        { code, 0, 0, 0, 0, 0, 0, 0 }
+        SOL_NUM,
+        TOPIC_STATUS
     };
+    statusFrame.data[0] = code;
     sendMessage(&statusFrame);
 }
