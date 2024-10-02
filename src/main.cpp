@@ -107,7 +107,7 @@ extern "C" void loop() {
         if (dataQueue.size() == MESSAGE_BUF_LEN && dataQueue[0] == 255 && dataQueue[1] == 255) {
             const auto message = reinterpret_cast<message_t *>(dataQueue.data());
 
-            if (!checkCrc(message)) {
+            if (checkCrc(message)) {
                 dataQueue.clear();
                 if (!dispatchCallback(message)) {
                     sendError(ERROR_BAD_TOPIC, message->identifier);
