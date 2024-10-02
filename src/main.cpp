@@ -50,6 +50,8 @@ extern "C" void setup() {
     onboardLedComponent.setColor(0, 255, 50);
 
     Serial.begin(115200);
+    Wire.begin();
+    Wire.setTimeout(500);
 
     registerTopic(TOPIC_RESET, [](const message_t *) {
         sendStatus(STATUS_RESET);
@@ -91,6 +93,7 @@ extern "C" void loop() {
     } else if (!hasNotifiedReady) {
         delay(50);
         sendStatus(STATUS_READY);
+        servoComponent.status();
         hasNotifiedReady = true;
     }
 
@@ -104,7 +107,7 @@ extern "C" void loop() {
         if (dataQueue.size() == MESSAGE_BUF_LEN && dataQueue[0] == 255 && dataQueue[1] == 255) {
             const auto message = reinterpret_cast<message_t *>(dataQueue.data());
 
-            if (true) {// !checkCrc(message)) {
+            if (!checkCrc(message)) {
                 dataQueue.clear();
                 if (!dispatchCallback(message)) {
                     sendError(ERROR_BAD_TOPIC, message->identifier);
@@ -113,7 +116,7 @@ extern "C" void loop() {
         }
     }
 
-    // servoComponent.update();
+    servoComponent.update();
     thermalComponent.update();
 
     Watchdog.reset();

@@ -6,6 +6,7 @@ class ServoComponent {
 public:
     ServoComponent();
     void setup();
+    void status() const;
     void reset();
     void eStop();
 
@@ -15,13 +16,13 @@ public:
     void setMicroseconds(uint8_t num, uint16_t microseconds);
 
 private:
-    bool lastConnected;
+    bool connected;
     uint32_t lastUpdate;
     bool enabled;
     uint16_t microsecondsArr[8];
 
     Adafruit_PWMServoDriver driver;
 
-    bool checkConnection();
+    static bool checkConnection();
     void sendConfig();
 };

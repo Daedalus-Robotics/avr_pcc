@@ -3,6 +3,7 @@
 #include <cstdint>
 #include <functional>
 
+#define MESSAGE_DATA_LEN 32
 #define MESSAGE_BUF_LEN (static_cast<int>(sizeof(message_t)))
 #define SOL_NUM 0b1111111111111111
 
@@ -10,7 +11,7 @@
 struct message_t {
     uint16_t sol;
     uint16_t identifier; // The id or topic of the message
-    uint8_t data[32]; // The data payload of the message (32 bytes)
+    uint8_t data[MESSAGE_DATA_LEN]; // The data payload of the message (32 bytes)
     uint16_t crc; // The CRC 15 checksum of the data for error checking with an extra bit because why not
 };
 #pragma pack()

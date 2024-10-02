@@ -9,7 +9,7 @@
 static std::unordered_map<uint16_t, topic_callback> topic_callbacks;
 
 inline uint16_t get_crc(const message_t *message) {
-    return crc15can_byte(0, message->data, MESSAGE_BUF_LEN);
+    return crc15can_byte(0, message->data, MESSAGE_DATA_LEN);
 }
 
 inline void append_crc(message_t *message) {

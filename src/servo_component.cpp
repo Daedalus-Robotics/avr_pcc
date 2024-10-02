@@ -4,15 +4,21 @@
 #include "topics.h"
 #include "../../../.platformio/packages/toolchain-gccarmnoneeabi/arm-none-eabi/include/c++/9.3.1/chrono"
 
-#define REFRESH_INTERVAL 15000
+#define STATUS_REFRESH_INTERVAL 100
+#define REFRESH_INTERVAL 5000
 #define OSCILLATOR_FREQ 27000000
 #define PWM_FREQ 50
 
-ServoComponent::ServoComponent() : lastConnected(false), lastUpdate(0), enabled(false), microsecondsArr() {}
+ServoComponent::ServoComponent() : connected(false), lastUpdate(0), enabled(false), microsecondsArr() {}
 
 void ServoComponent::setup() {
-    sendConfig();
-    driver.sleep();
+    if (checkConnection()) {
+        sendConfig();
+        driver.sleep();
+        connected = true;
+    } else {
+        sendError(COMPONENT_SERVOS);
+    }
 
     registerTopic(TOPIC_SERVO_ENABLE, [this](const message_t *message) {
         setEnabled(message->data[0] != 0);
@@ -27,6 +33,12 @@ void ServoComponent::setup() {
             setMicroseconds(i + message->data[0], microsecondsArrPtr[i]);
         }
     });
+}
+
+void ServoComponent::status() const {
+    if (connected) {
+        sendError(COMPONENT_SERVOS);
+    }
 }
 
 void ServoComponent::reset() {
@@ -48,23 +60,27 @@ void ServoComponent::eStop() {
 }
 
 void ServoComponent::update() {
-    if ((checkConnection() && !lastConnected) || millis() - lastUpdate >= REFRESH_INTERVAL) {
-        lastConnected = true;
-        lastUpdate = millis();
+    const uint32_t time_passed = millis() - lastUpdate;
 
-        setEnabled(enabled);
-        delay(1);
-        if (enabled) {
-            sendConfig();
+    if (time_passed >= REFRESH_INTERVAL) {
+        if (connected) {
+            lastUpdate = millis();
+
+            setEnabled(enabled);
             delay(1);
-        }
-        for (uint8_t i = 0; i < 8; i++) {
-            driver.writeMicroseconds(i, microsecondsArr[i]);
+            if (enabled) {
+                sendConfig();
+                delay(1);
+            }
+            for (uint8_t i = 0; i < 8; i++) {
+                driver.writeMicroseconds(i, microsecondsArr[i]);
+            }
+
+            delay(1);
+        } else {
+            sendError(COMPONENT_SERVOS);
         }
 
-        delay(1);
-    } else {
-        lastConnected = false;
     }
 }
 
@@ -84,8 +100,8 @@ void ServoComponent::setMicroseconds(const uint8_t num, const uint16_t microseco
 }
 
 bool ServoComponent::checkConnection() {
-    const int res = driver.readPrescale();
-    return res != 0;
+    Wire.beginTransmission(PCA9685_I2C_ADDRESS);
+    return Wire.endTransmission() == 0;
 }
 
 void ServoComponent::sendConfig() {
