@@ -36,7 +36,7 @@ void ServoComponent::setup() {
 }
 
 void ServoComponent::status() const {
-    if (connected) {
+    if (!connected) {
         sendError(COMPONENT_SERVOS);
     }
 }
