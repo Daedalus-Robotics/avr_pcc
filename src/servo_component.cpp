@@ -16,6 +16,9 @@ void ServoComponent::setup() {
         sendConfig();
         driver.sleep();
         connected = true;
+        for (uint8_t i = 0; i < 8; i++) {
+            driver.writeMicroseconds(i, microsecondsArr[i]);
+        }
     } else {
         sendError(COMPONENT_SERVOS);
     }
@@ -91,6 +94,9 @@ void ServoComponent::setEnabled(const bool enabled) {
         sendConfig();
     } else {
         driver.sleep();
+        for (uint8_t i = 0; i < 8; i++) {
+            driver.writeMicroseconds(i, microsecondsArr[i]);
+        }
     }
 }
 
