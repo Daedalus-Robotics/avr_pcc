@@ -94,6 +94,7 @@ extern "C" void loop() {
         delay(50);
         sendStatus(STATUS_READY);
         servoComponent.status();
+        thermalComponent.status();
         hasNotifiedReady = true;
     }
 

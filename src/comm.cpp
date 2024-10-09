@@ -5,6 +5,7 @@
 
 #include "crc15can.hpp"
 #include "topics.h"
+#include "../.pio/libdeps/adafruit_feather_m4/Adafruit SleepyDog Library/Adafruit_SleepyDog.h"
 
 static std::unordered_map<uint16_t, topic_callback> topic_callbacks;
 
@@ -30,6 +31,7 @@ void sendMessage(message_t *message) {
         Serial.flush(); // The receiving end will request again if the data was necessary
     }
     Serial.write(reinterpret_cast<const uint8_t *>(message), MESSAGE_BUF_LEN);
+    delay(50);
 }
 
 bool dispatchCallback(const message_t *message) {
