@@ -119,6 +119,7 @@ extern "C" void loop() {
 
     servoComponent.update();
     thermalComponent.update();
+    ledStripComponent.update();
 
     Watchdog.reset();
 }

@@ -4,7 +4,7 @@
 #include "topics.h"
 
 #define REFRESH_RATE 10
-#define REFRESH_INTERVAL (60 / REFRESH_RATE)
+#define REFRESH_INTERVAL (1000 / REFRESH_RATE)
 
 ThermalComponent::ThermalComponent() : isConnected(false), lastUpdate(millis()), rowCount() {}
 
